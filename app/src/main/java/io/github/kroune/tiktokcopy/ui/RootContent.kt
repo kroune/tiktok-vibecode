@@ -10,7 +10,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import io.github.kroune.tiktokcopy.component.RootComponent
 import io.github.kroune.tiktokcopy.ui.screens.ChatScreen
-import io.github.kroune.tiktokcopy.ui.screens.ExpenseScreen
 import io.github.kroune.tiktokcopy.ui.screens.WelcomeScreen
 
 @Composable
@@ -27,12 +26,8 @@ fun RootContent(component: RootComponent) {
                     onEvent = instance.component::onEvent
                 )
             }
-            is RootComponent.Child.ExpenseScreen -> {
-                val state by instance.component.state.collectAsState()
-                ExpenseScreen(
-                    state = state,
-                    onEvent = instance.component::onEvent
-                )
+            is RootComponent.Child.Main -> {
+                MainContent(component = instance.component)
             }
             is RootComponent.Child.ChatScreen -> {
                 val state by instance.component.state.collectAsState()

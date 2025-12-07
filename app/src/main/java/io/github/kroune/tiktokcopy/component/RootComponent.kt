@@ -37,9 +37,9 @@ class RootComponent(
         scope.launch {
             val isFirstLaunch = firstLaunchManager.isFirstLaunchValue()
             if (!isFirstLaunch) {
-                // Если это не первый запуск, заменяем welcome screen на expense screen
+                // Если это не первый запуск, заменяем welcome screen на main screen
                 @OptIn(DelicateDecomposeApi::class)
-                navigation.replaceAll(Config.ExpenseScreen)
+                navigation.replaceAll(Config.Main)
             }
         }
 
@@ -60,12 +60,12 @@ class RootComponent(
                     componentContext = componentContext,
                     firstLaunchManager = firstLaunchManager,
                     onComplete = {
-                        navigation.replaceAll(Config.ExpenseScreen)
+                        navigation.replaceAll(Config.Main)
                     }
                 )
             )
-            is Config.ExpenseScreen -> Child.ExpenseScreen(
-                component = ExpenseScreenComponent(
+            is Config.Main -> Child.Main(
+                component = MainComponent(
                     componentContext = componentContext,
                     repository = repository,
                     onNavigateToChat = { analysis, expenses ->
@@ -88,7 +88,7 @@ class RootComponent(
 
     sealed class Child {
         class WelcomeScreen(val component: WelcomeScreenComponent) : Child()
-        class ExpenseScreen(val component: ExpenseScreenComponent) : Child()
+        class Main(val component: MainComponent) : Child()
         class ChatScreen(val component: ChatScreenComponent) : Child()
     }
 
@@ -98,7 +98,7 @@ class RootComponent(
         data object WelcomeScreen : Config
 
         @Serializable
-        data object ExpenseScreen : Config
+        data object Main : Config
 
         @Serializable
         data class ChatScreen(

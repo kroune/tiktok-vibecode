@@ -188,7 +188,11 @@ class ExpenseApiService {
                 Log.d(TAG, "Making API request to: $BASE_URL/chat")
                 val response: HttpResponse = client.post("$BASE_URL/chat") {
                     contentType(ContentType.Application.Json)
-                    setBody(ChatRequest(message, expenses, chatHistory))
+                    setBody(ChatRequest(
+                        message = message,
+                        expenses = expenses,
+                        chatHistory = chatHistory.map { listOf(it.first, it.second) }
+                    ))
                 }
 
                 val responseBody = response.bodyAsText()
@@ -383,7 +387,7 @@ private data class GenerateCategoryResponse(
 private data class ChatRequest(
     val message: String,
     val expenses: List<Expense>,
-    val chatHistory: List<Pair<String, String>>
+    val chatHistory: List<List<String>>
 )
 
 @Serializable
