@@ -37,11 +37,6 @@ class ExpenseScreenComponent(
                 }
             }
 
-            is ExpenseScreenEvent.UpdateCategory -> {
-                _state.update {
-                    it.copy(categoryInput = event.category)
-                }
-            }
 
             is ExpenseScreenEvent.UpdateDescription -> {
                 _state.update {
@@ -80,42 +75,49 @@ class ExpenseScreenComponent(
                     return
                 }
 
-                if (currentState.categoryInput.isEmpty()) {
+                val description = currentState.descriptionInput.trim()
+                if (description.isEmpty()) {
                     _state.update {
-                        it.copy(error = "Введите категорию")
+                        it.copy(error = "Введите описание расхода")
                     }
                     return
                 }
 
+                // Создаем расход с флагом isGeneratingCategory
                 val newExpense = Expense(
                     amount = amount,
-                    category = currentState.categoryInput.trim(),
-                    description = currentState.descriptionInput.trim(),
-                    date = currentState.selectedDate
+                    category = null, // Категория будет сгенерирована позже
+                    description = description,
+                    date = currentState.selectedDate,
+                    isGeneratingCategory = true
                 )
+
                 _state.update {
                     it.copy(
                         amountInput = "",
-                        categoryInput = "",
                         descriptionInput = "",
                         selectedDate = LocalDateTime.now(),
-                        isLoading = true,
                         error = null
                     )
                 }
 
-                // Сохранение в базу данных и отправка на сервер
+                // Сохранение в базу данных и генерация категории
                 launch {
                     repository.insertExpense(newExpense).fold(
                         onSuccess = {
-                            _state.update { it.copy(isLoading = false) }
+                            // Запускаем генерацию категории в фоне
+                            launch {
+                                repository.generateAndUpdateCategory(
+                                    expenseId = newExpense.id,
+                                    description = description,
+                                    amount = amount
+                                )
+                                // Не обрабатываем результат - категория обновится через Flow
+                            }
                         },
                         onFailure = { error ->
                             _state.update {
-                                it.copy(
-                                    isLoading = false,
-                                    error = error.message
-                                )
+                                it.copy(error = error.message)
                             }
                         }
                     )
@@ -141,7 +143,6 @@ class ExpenseScreenComponent(
                 _state.update {
                     it.copy(
                         amountInput = "",
-                        categoryInput = "",
                         descriptionInput = "",
                         selectedDate = LocalDateTime.now()
                     )
@@ -223,7 +224,6 @@ class ExpenseScreenComponent(
                 val monthAgo = now.minusMonths(1)
                 expenses.filter { it.date >= monthAgo }
             }
-            DateFilter.CUSTOM -> expenses // Для будущего расширения
         }
     }
 }

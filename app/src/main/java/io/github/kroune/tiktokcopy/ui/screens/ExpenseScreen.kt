@@ -1,7 +1,9 @@
 package io.github.kroune.tiktokcopy.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,27 +16,33 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,11 +51,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.kroune.tiktokcopy.domain.entities.DateFilter
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseScreenEvent
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseScreenState
+import io.github.kroune.tiktokcopy.ui.theme.SoftPastelColors
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -59,33 +72,75 @@ fun ExpenseScreen(
     state: ExpenseScreenState,
     onEvent: (ExpenseScreenEvent) -> Unit
 ) {
-    LazyColumn(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(SoftPastelColors.SoftBackground)
     ) {
-        item {
-            Text(
-                text = "Анализ расходов",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                // Header with gradient
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(
+                            elevation = 12.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            ambientColor = SoftPastelColors.SoftShadowBlue,
+                            spotColor = SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.35f)
+                        )
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    SoftPastelColors.PrimaryGradientStart,
+                                    SoftPastelColors.PrimaryGradientEnd
+                                )
+                            ),
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Анализ расходов",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.SurfaceWhite
+                        )
+                    )
+                }
+            }
 
         // Фильтры по периоду
         item {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .shadow(
+                        elevation = 6.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        ambientColor = SoftPastelColors.SoftShadowDark,
+                        spotColor = SoftPastelColors.SoftShadowGray
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = SoftPastelColors.SurfaceWhite
+                ),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         text = "Фильтр для анализа:",
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.TextDark
+                        )
                     )
                     Row(
                         modifier = Modifier
@@ -104,10 +159,16 @@ fun ExpenseScreen(
                                             DateFilter.TODAY -> "Сегодня"
                                             DateFilter.WEEK -> "Неделя"
                                             DateFilter.MONTH -> "Месяц"
-                                            DateFilter.CUSTOM -> "Свой период"
                                         }
                                     )
-                                }
+                                },
+                                shape = RoundedCornerShape(50),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = SoftPastelColors.PrimaryGradientEnd,
+                                    selectedLabelColor = SoftPastelColors.SurfaceWhite,
+                                    containerColor = SoftPastelColors.IceBlueBackground,
+                                    labelColor = SoftPastelColors.TextMuted
+                                )
                             )
                         }
                     }
@@ -120,15 +181,23 @@ fun ExpenseScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        ambientColor = SoftPastelColors.SoftShadowDark,
+                        spotColor = SoftPastelColors.SoftShadowGray
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = SoftPastelColors.SurfaceWhite
+                ),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     val amountError = state.amountInput.isNotEmpty() &&
                             state.amountInput.toDoubleOrNull() == null
-                    val categoryError =
-                        state.categoryInput.isEmpty() && state.amountInput.isNotEmpty()
 
                     TextField(
                         value = state.amountInput,
@@ -138,45 +207,60 @@ fun ExpenseScreen(
                                 onEvent(ExpenseScreenEvent.UpdateAmount(newValue.replace(',', '.')))
                             }
                         },
-                        label = { Text("Сумма") },
+                        label = { Text("Сумма", color = SoftPastelColors.TextMuted) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         isError = amountError,
                         supportingText = if (amountError) {
-                            { Text("Введите корректную сумму") }
-                        } else null
-                    )
-
-                    TextField(
-                        value = state.categoryInput,
-                        onValueChange = { onEvent(ExpenseScreenEvent.UpdateCategory(it)) },
-                        label = { Text("Категория") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        isError = categoryError,
-                        supportingText = if (categoryError) {
-                            { Text("Категория обязательна") }
-                        } else null
+                            { Text("Введите корректную сумму", color = SoftPastelColors.SecondaryAccent) }
+                        } else null,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            focusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = SoftPastelColors.PrimaryGradientEnd,
+                            cursorColor = SoftPastelColors.PrimaryGradientEnd,
+                            focusedTextColor = SoftPastelColors.TextDark,
+                            unfocusedTextColor = SoftPastelColors.TextDark
+                        )
                     )
 
                     TextField(
                         value = state.descriptionInput,
                         onValueChange = { onEvent(ExpenseScreenEvent.UpdateDescription(it)) },
-                        label = { Text("Описание (опционально)") },
+                        label = { Text("Описание", color = SoftPastelColors.TextMuted) },
+                        placeholder = { Text("Например: Купил продукты в магазине", color = SoftPastelColors.TextMuted.copy(alpha = 0.6f)) },
                         modifier = Modifier.fillMaxWidth(),
-                        maxLines = 3
+                        maxLines = 3,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            focusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = SoftPastelColors.PrimaryGradientEnd,
+                            cursorColor = SoftPastelColors.PrimaryGradientEnd,
+                            focusedTextColor = SoftPastelColors.TextDark,
+                            unfocusedTextColor = SoftPastelColors.TextDark
+                        )
                     )
 
                     // Выбор даты
                     OutlinedButton(
                         onClick = { onEvent(ExpenseScreenEvent.ToggleDatePicker) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = SoftPastelColors.IceBlueBackground,
+                            contentColor = SoftPastelColors.TextDark
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Выбрать дату",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
+                            tint = SoftPastelColors.PrimaryGradientEnd
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -198,24 +282,34 @@ fun ExpenseScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         val canAdd = state.amountInput.isNotEmpty() &&
                                 state.amountInput.toDoubleOrNull() != null &&
                                 state.amountInput.toDoubleOrNull()!! > 0 &&
-                                state.categoryInput.isNotEmpty()
+                                state.descriptionInput.isNotEmpty()
 
                         Button(
                             onClick = { onEvent(ExpenseScreenEvent.AddExpense) },
                             modifier = Modifier.weight(1f),
-                            enabled = canAdd
+                            enabled = canAdd,
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = SoftPastelColors.PrimaryGradientEnd,
+                                contentColor = SoftPastelColors.SurfaceWhite,
+                                disabledContainerColor = SoftPastelColors.TextMuted.copy(alpha = 0.3f)
+                            )
                         ) {
-                            Text("Добавить")
+                            Text("Добавить", fontWeight = FontWeight.Bold)
                         }
 
                         OutlinedButton(
                             onClick = { onEvent(ExpenseScreenEvent.ClearForm) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = SoftPastelColors.TextMuted
+                            )
                         ) {
                             Text("Очистить")
                         }
@@ -228,7 +322,10 @@ fun ExpenseScreen(
         item {
             Text(
                 text = "Расходы (${state.filteredExpenses.size})",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = SoftPastelColors.TextDark
+                )
             )
         }
 
@@ -236,17 +333,33 @@ fun ExpenseScreen(
         item {
             Button(
                 onClick = { onEvent(ExpenseScreenEvent.AnalyzeExpenses) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = state.filteredExpenses.isNotEmpty() && !state.isAnalyzing
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = if (state.filteredExpenses.isNotEmpty() && !state.isAnalyzing) 8.dp else 0.dp,
+                        shape = RoundedCornerShape(50),
+                        ambientColor = SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.3f),
+                        spotColor = SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.3f)
+                    ),
+                enabled = state.filteredExpenses.isNotEmpty() && !state.isAnalyzing,
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SoftPastelColors.PrimaryGradientEnd,
+                    contentColor = SoftPastelColors.SurfaceWhite,
+                    disabledContainerColor = SoftPastelColors.TextMuted.copy(alpha = 0.3f)
+                )
             ) {
                 if (state.isAnalyzing) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = SoftPastelColors.SurfaceWhite
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
-                Text(if (state.isAnalyzing) "Анализируем..." else "Анализировать расходы")
+                Text(
+                    if (state.isAnalyzing) "Анализируем..." else "Анализировать расходы",
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
@@ -254,23 +367,47 @@ fun ExpenseScreen(
         state.error?.let { errorMessage ->
             item {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            ambientColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.25f),
+                            spotColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.2f)
+                        ),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                        containerColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.15f)
+                    ),
+                    shape = RoundedCornerShape(24.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "❌ ",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(
+                                    color = SoftPastelColors.SecondaryAccent,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "!",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = SoftPastelColors.SurfaceWhite
+                                )
+                            )
+                        }
                         Text(
                             text = errorMessage,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = SoftPastelColors.TextDark
+                            ),
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
@@ -282,45 +419,85 @@ fun ExpenseScreen(
             if (result.isNotBlank()) {
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 10.dp,
+                                shape = RoundedCornerShape(24.dp),
+                                ambientColor = SoftPastelColors.PastelMint.copy(alpha = 0.3f),
+                                spotColor = SoftPastelColors.SoftShadowDark
+                            ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                            containerColor = SoftPastelColors.SurfaceWhite
                         ),
+                        shape = RoundedCornerShape(24.dp),
                         onClick = {
                             onEvent(ExpenseScreenEvent.OpenChatWithAnalysis)
                         }
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(
+                                                brush = Brush.horizontalGradient(
+                                                    colors = listOf(
+                                                        SoftPastelColors.PrimaryGradientStart,
+                                                        SoftPastelColors.PrimaryGradientEnd
+                                                    )
+                                                ),
+                                                shape = CircleShape
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "✓",
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                color = SoftPastelColors.SurfaceWhite
+                                            )
+                                        )
+                                    }
+                                    Text(
+                                        text = "Результат анализа",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = SoftPastelColors.TextDark
+                                        )
+                                    )
+                                }
                                 Text(
-                                    text = "Результат анализа:",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                                Text(
-                                    text = "💬 Открыть чат",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    text = "💬",
+                                    style = MaterialTheme.typography.titleMedium
                                 )
                             }
                             Text(
                                 text = result,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = SoftPastelColors.TextDark
+                                ),
                                 maxLines = 5,
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Нажмите, чтобы обсудить детали с AI ассистентом",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = SoftPastelColors.TextMuted,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                                )
                             )
                         }
                     }
@@ -336,6 +513,7 @@ fun ExpenseScreen(
             )
         }
     }
+    }
 }
 
 @Composable
@@ -346,47 +524,119 @@ fun ExpenseItem(
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(20.dp),
+                ambientColor = SoftPastelColors.SoftShadowDark,
+                spotColor = SoftPastelColors.SoftShadowGray
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = SoftPastelColors.SurfaceWhite
+        ),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Иконка категории с индикатором загрузки
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = if (expense.isGeneratingCategory)
+                            SoftPastelColors.TextMuted.copy(alpha = 0.1f)
+                        else
+                            SoftPastelColors.IceBlueBackground,
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (expense.isGeneratingCategory) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = SoftPastelColors.PrimaryGradientEnd,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = (expense.category ?: "??").take(2).uppercase(),
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.PrimaryGradientEnd
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = expense.category,
-                    style = MaterialTheme.typography.titleSmall
-                )
+                if (expense.isGeneratingCategory) {
+                    Text(
+                        text = "Определяем категорию...",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.TextMuted
+                        )
+                    )
+                } else {
+                    Text(
+                        text = expense.category ?: "Без категории",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.TextDark
+                        )
+                    )
+                }
                 if (expense.description.isNotEmpty()) {
                     Text(
                         text = expense.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = SoftPastelColors.TextMuted
+                        )
                     )
                 }
                 Text(
                     text = expense.date.format(dateFormatter),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = SoftPastelColors.TextMuted
+                    )
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "₽${String.format(Locale.getDefault(), "%.2f", expense.amount)}",
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = SoftPastelColors.TextDark
+                    )
                 )
 
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Удалить")
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(32.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.15f),
+                        contentColor = SoftPastelColors.SecondaryAccent
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Удалить",
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
         }

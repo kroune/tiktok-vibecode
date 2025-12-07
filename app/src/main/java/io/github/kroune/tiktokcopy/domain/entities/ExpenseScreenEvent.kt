@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 
 sealed class ExpenseScreenEvent {
     data class UpdateAmount(val amount: String) : ExpenseScreenEvent()
-    data class UpdateCategory(val category: String) : ExpenseScreenEvent()
     data class UpdateDescription(val description: String) : ExpenseScreenEvent()
     data class UpdateSelectedDate(val date: LocalDateTime) : ExpenseScreenEvent()
     data class UpdateDateFilter(val filter: DateFilter) : ExpenseScreenEvent()

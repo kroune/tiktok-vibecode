@@ -5,6 +5,5 @@ enum class DateFilter {
     TODAY,      // За сегодня
     WEEK,       // За неделю
     MONTH,      // За месяц
-    CUSTOM      // Пользовательский период
 }
 

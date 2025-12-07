@@ -8,7 +8,6 @@ data class ExpenseScreenState(
     val expenses: List<Expense> = emptyList(),
     val filteredExpenses: List<Expense> = emptyList(),
     val amountInput: String = "",
-    val categoryInput: String = "",
     val descriptionInput: String = "",
     val selectedDate: LocalDateTime = LocalDateTime.now(),
     val isLoading: Boolean = false,

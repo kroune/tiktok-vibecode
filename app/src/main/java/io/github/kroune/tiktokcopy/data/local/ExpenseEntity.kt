@@ -12,9 +12,10 @@ data class ExpenseEntity(
     @PrimaryKey
     val id: String,
     val amount: Double,
-    val category: String,
+    val category: String?,
     val description: String,
-    val date: LocalDateTime
+    val date: LocalDateTime,
+    val isGeneratingCategory: Boolean = false
 ) {
     fun toDomain(): Expense {
         return Expense(
@@ -22,7 +23,8 @@ data class ExpenseEntity(
             amount = amount,
             category = category,
             description = description,
-            date = date
+            date = date,
+            isGeneratingCategory = isGeneratingCategory
         )
     }
 
@@ -33,7 +35,8 @@ data class ExpenseEntity(
                 amount = expense.amount,
                 category = expense.category,
                 description = expense.description,
-                date = expense.date
+                date = expense.date,
+                isGeneratingCategory = expense.isGeneratingCategory
             )
         }
     }

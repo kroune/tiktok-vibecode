@@ -23,15 +23,41 @@ class ExpenseRepository(
 
     suspend fun insertExpense(expense: Expense): Result<Unit> {
         return try {
-            // Сохраняем локально
+            // Сохраняем локально (пока без категории, с флагом isGeneratingCategory)
             expenseDao.insertExpense(ExpenseEntity.fromDomain(expense))
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
-            // Пытаемся отправить на сервер
-            apiService.sendExpenses(listOf(expense)).fold(
-                onSuccess = { Result.success(Unit) },
-                onFailure = {
-                    // Даже если отправка на сервер не удалась, локально данные сохранены
-                    Result.success(Unit)
+    suspend fun generateAndUpdateCategory(expenseId: String, description: String, amount: Double): Result<String> {
+        return try {
+            // Генерируем категорию на сервере
+            apiService.generateCategory(description, amount).fold(
+                onSuccess = { category ->
+                    // Обновляем расход с полученной категорией
+                    val expense = expenseDao.getExpenseById(expenseId)
+                    if (expense != null) {
+                        val updatedExpense = expense.copy(
+                            category = category,
+                            isGeneratingCategory = false
+                        )
+                        expenseDao.insertExpense(updatedExpense)
+                    }
+                    Result.success(category)
+                },
+                onFailure = { error ->
+                    // Если генерация не удалась, убираем флаг загрузки и ставим категорию по умолчанию
+                    val expense = expenseDao.getExpenseById(expenseId)
+                    if (expense != null) {
+                        val updatedExpense = expense.copy(
+                            category = "Прочее",
+                            isGeneratingCategory = false
+                        )
+                        expenseDao.insertExpense(updatedExpense)
+                    }
+                    Result.failure(error)
                 }
             )
         } catch (e: Exception) {
@@ -43,12 +69,7 @@ class ExpenseRepository(
         return try {
             val entities = expenses.map { ExpenseEntity.fromDomain(it) }
             expenseDao.insertExpenses(entities)
-
-            // Пытаемся отправить на сервер
-            apiService.sendExpenses(expenses).fold(
-                onSuccess = { Result.success(Unit) },
-                onFailure = { Result.success(Unit) }
-            )
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -31,9 +31,10 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
 data class Expense(
     val id: String = java.util.UUID.randomUUID().toString(),
     val amount: Double = 0.0,
-    val category: String = "",
+    val category: String? = null,
     val description: String = "",
     @Serializable(with = LocalDateTimeSerializer::class)
-    val date: LocalDateTime = LocalDateTime.now()
+    val date: LocalDateTime = LocalDateTime.now(),
+    val isGeneratingCategory: Boolean = false
 )
 

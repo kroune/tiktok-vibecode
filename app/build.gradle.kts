@@ -51,8 +51,8 @@ dependencies {
     implementation(compose.ui)
     implementation(compose.components.resources)
 
-    implementation("androidx.compose.material:material-icons-core:1.7.8")
-    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     api(libs.decompose)
     implementation(libs.decompose.animations)
@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.serialization.kotlinx.protobuf)
     implementation(libs.ktor.client.content.negotiation)
+
+    implementation(libs.vico.compose.m3)
 
     implementation(libs.kotlinx.coroutines.core)
 

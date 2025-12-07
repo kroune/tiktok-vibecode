@@ -1,9 +1,11 @@
 package io.github.kroune.tiktokcopy.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,11 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.kroune.tiktokcopy.domain.entities.ChatMessage
 import io.github.kroune.tiktokcopy.domain.entities.ChatScreenEvent
 import io.github.kroune.tiktokcopy.domain.entities.ChatScreenState
+import io.github.kroune.tiktokcopy.ui.theme.SoftPastelColors
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
@@ -40,18 +46,50 @@ fun ChatScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Чат с AI ассистентом") },
-                navigationIcon = {
-                    IconButton(onClick = { onEvent(ChatScreenEvent.NavigateBack) }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 8.dp,
+                        ambientColor = SoftPastelColors.SoftShadowBlue,
+                        spotColor = SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.3f)
+                    )
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                SoftPastelColors.PrimaryGradientStart,
+                                SoftPastelColors.PrimaryGradientEnd
+                            )
+                        )
+                    )
+                    .statusBarsPadding()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { onEvent(ChatScreenEvent.NavigateBack) },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = SoftPastelColors.SurfaceWhite
+                        )
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            )
-        }
+                    Text(
+                        text = "AI Ассистент",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = SoftPastelColors.SurfaceWhite
+                        )
+                    )
+                }
+            }
+        },
+        containerColor = SoftPastelColors.SoftBackground
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -81,21 +119,33 @@ fun ChatScreen(
                             horizontalArrangement = Arrangement.Start
                         ) {
                             Card(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(20.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = SoftPastelColors.SurfaceWhite
+                                ),
+                                modifier = Modifier.shadow(
+                                    elevation = 6.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                    ambientColor = SoftPastelColors.SoftShadowDark,
+                                    spotColor = SoftPastelColors.SoftShadowGray
                                 )
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(16.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp
+                                        strokeWidth = 2.dp,
+                                        color = SoftPastelColors.PrimaryGradientEnd
                                     )
-                                    Text("AI думает...", style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        "AI думает...",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            color = SoftPastelColors.TextMuted
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -105,22 +155,49 @@ fun ChatScreen(
 
             // Отображение ошибок
             state.error?.let { errorMessage ->
-                Surface(
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    modifier = Modifier.fillMaxWidth()
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.25f),
+                            spotColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.2f)
+                        ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = SoftPastelColors.SecondaryAccent.copy(alpha = 0.15f)
+                    ),
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "❌ ",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(
+                                    color = SoftPastelColors.SecondaryAccent,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "!",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = SoftPastelColors.SurfaceWhite
+                                )
+                            )
+                        }
                         Text(
                             text = errorMessage,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = SoftPastelColors.TextDark
+                            ),
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
@@ -128,35 +205,67 @@ fun ChatScreen(
 
             // Поле ввода сообщения
             Surface(
-                shadowElevation = 8.dp,
-                tonalElevation = 2.dp
+                shadowElevation = 0.dp,
+                tonalElevation = 0.dp,
+                color = SoftPastelColors.SurfaceWhite,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 12.dp,
+                        ambientColor = SoftPastelColors.SoftShadowDark,
+                        spotColor = SoftPastelColors.SoftShadowGray
+                    )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     TextField(
                         value = state.inputText,
                         onValueChange = { onEvent(ChatScreenEvent.UpdateInputText(it)) },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Введите сообщение...") },
+                        placeholder = {
+                            Text(
+                                "Введите сообщение...",
+                                color = SoftPastelColors.TextMuted
+                            )
+                        },
                         maxLines = 4,
                         enabled = !state.isLoading,
                         shape = RoundedCornerShape(24.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            unfocusedContainerColor = SoftPastelColors.IceBlueBackground,
+                            disabledContainerColor = SoftPastelColors.IceBlueBackground,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent
+                            disabledIndicatorColor = Color.Transparent,
+                            cursorColor = SoftPastelColors.PrimaryGradientEnd,
+                            focusedTextColor = SoftPastelColors.TextDark,
+                            unfocusedTextColor = SoftPastelColors.TextDark
                         )
                     )
 
                     FilledIconButton(
                         onClick = { onEvent(ChatScreenEvent.SendMessage) },
                         enabled = state.inputText.isNotBlank() && !state.isLoading,
-                        modifier = Modifier.size(56.dp)
+                        modifier = Modifier
+                            .size(56.dp)
+                            .shadow(
+                                elevation = if (state.inputText.isNotBlank() && !state.isLoading) 10.dp else 0.dp,
+                                shape = CircleShape,
+                                ambientColor = SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.4f),
+                                spotColor = SoftPastelColors.SoftShadowBlue
+                            ),
+                        shape = CircleShape,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = SoftPastelColors.PrimaryGradientEnd,
+                            contentColor = SoftPastelColors.SurfaceWhite,
+                            disabledContainerColor = SoftPastelColors.TextMuted.copy(alpha = 0.3f)
+                        )
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
@@ -180,40 +289,59 @@ fun ChatMessageItem(message: ChatMessage) {
     ) {
         Card(
             shape = RoundedCornerShape(
-                topStart = 12.dp,
-                topEnd = 12.dp,
-                bottomStart = if (message.isFromUser) 12.dp else 4.dp,
-                bottomEnd = if (message.isFromUser) 4.dp else 12.dp
+                topStart = 20.dp,
+                topEnd = 20.dp,
+                bottomStart = if (message.isFromUser) 20.dp else 4.dp,
+                bottomEnd = if (message.isFromUser) 4.dp else 20.dp
             ),
             colors = CardDefaults.cardColors(
                 containerColor = if (message.isFromUser)
-                    MaterialTheme.colorScheme.primaryContainer
+                    SoftPastelColors.PrimaryGradientEnd
                 else
-                    MaterialTheme.colorScheme.surfaceVariant
+                    SoftPastelColors.SurfaceWhite
             ),
-            modifier = Modifier.widthIn(max = 300.dp)
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .shadow(
+                    elevation = 6.dp,
+                    shape = RoundedCornerShape(
+                        topStart = 20.dp,
+                        topEnd = 20.dp,
+                        bottomStart = if (message.isFromUser) 20.dp else 4.dp,
+                        bottomEnd = if (message.isFromUser) 4.dp else 20.dp
+                    ),
+                    ambientColor = if (message.isFromUser)
+                        SoftPastelColors.SoftShadowBlue
+                    else
+                        SoftPastelColors.SoftShadowDark,
+                    spotColor = if (message.isFromUser)
+                        SoftPastelColors.PrimaryGradientEnd.copy(alpha = 0.3f)
+                    else
+                        SoftPastelColors.SoftShadowGray
+                )
         ) {
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = message.text,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (message.isFromUser)
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = if (message.isFromUser)
+                            SoftPastelColors.SurfaceWhite
+                        else
+                            SoftPastelColors.TextDark
+                    )
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = message.timestamp.format(timeFormatter),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (message.isFromUser)
-                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = if (message.isFromUser)
+                            SoftPastelColors.SurfaceWhite.copy(alpha = 0.8f)
+                        else
+                            SoftPastelColors.TextMuted
+                    )
                 )
             }
         }
