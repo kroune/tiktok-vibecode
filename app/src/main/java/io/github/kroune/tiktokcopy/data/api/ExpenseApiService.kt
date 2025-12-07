@@ -1,10 +1,12 @@
 package io.github.kroune.tiktokcopy.data.api
 
+import android.util.Log
 import io.github.kroune.tiktokcopy.domain.entities.Expense
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
 import io.ktor.client.*
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -25,6 +27,7 @@ import kotlinx.serialization.json.Json
 class ExpenseApiService {
 
     companion object {
+        private const val TAG = "ExpenseApiService"
         private const val BASE_URL = "https://vibecode.kroune.tech/api"
         private const val MOCK_MODE = false // Включен режим mock данных для разработки
     }
@@ -36,6 +39,15 @@ class ExpenseApiService {
                 isLenient = true
                 prettyPrint = true
             })
+        }
+
+        install(Logging) {
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Log.d(TAG, "HTTP: $message")
+                }
+            }
+            level = LogLevel.ALL
         }
     }
 
@@ -59,17 +71,29 @@ class ExpenseApiService {
      * @return Result с категорией или ошибкой
      */
     suspend fun generateCategory(description: String, amount: Double): Result<String> {
+        Log.d(TAG, "generateCategory() called with: description='$description', amount=$amount")
+
         return if (MOCK_MODE) {
+            Log.d(TAG, "Using MOCK_MODE for generateCategory")
             generateMockCategory(description, amount)
         } else {
             try {
+                Log.d(TAG, "Making API request to: $BASE_URL/expenses/generate-category")
                 val response: HttpResponse = client.post("$BASE_URL/expenses/generate-category") {
                     contentType(ContentType.Application.Json)
                     setBody(GenerateCategoryRequest(description, amount))
                 }
-                val result = Json.decodeFromString<GenerateCategoryResponse>(response.bodyAsText())
+
+                val responseBody = response.bodyAsText()
+                Log.d(TAG, "API response status: ${response.status}")
+                Log.d(TAG, "API response body: $responseBody")
+
+                val result = Json.decodeFromString<GenerateCategoryResponse>(responseBody)
+                Log.d(TAG, "Successfully generated category: ${result.category}")
                 Result.success(result.category)
             } catch (e: Exception) {
+                Log.e(TAG, "Error generating category", e)
+                Log.e(TAG, "Error details: ${e.message}")
                 Result.failure(e)
             }
         }
@@ -96,17 +120,30 @@ class ExpenseApiService {
      * @return Result с объектом ExpenseAnalysis или ошибкой
      */
     suspend fun analyzeExpenses(expenses: List<Expense>): Result<ExpenseAnalysis> {
+        Log.d(TAG, "analyzeExpenses() called with ${expenses.size} expenses")
+        Log.d(TAG, "Total amount to analyze: ${expenses.sumOf { it.amount }}")
+
         return if (MOCK_MODE) {
+            Log.d(TAG, "Using MOCK_MODE for analyzeExpenses")
             generateMockAnalysis(expenses)
         } else {
             try {
+                Log.d(TAG, "Making API request to: $BASE_URL/expenses/analyze")
                 val response: HttpResponse = client.post("$BASE_URL/expenses/analyze") {
                     contentType(ContentType.Application.Json)
                     setBody(expenses)
                 }
-                val analysis = Json.decodeFromString<ExpenseAnalysis>(response.bodyAsText())
+
+                val responseBody = response.bodyAsText()
+                Log.d(TAG, "API response status: ${response.status}")
+                Log.d(TAG, "API response body: $responseBody")
+
+                val analysis = Json.decodeFromString<ExpenseAnalysis>(responseBody)
+                Log.d(TAG, "Successfully analyzed expenses: totalAmount=${analysis.totalAmount}, topCategory=${analysis.topCategory}")
                 Result.success(analysis)
             } catch (e: Exception) {
+                Log.e(TAG, "Error analyzing expenses", e)
+                Log.e(TAG, "Error details: ${e.message}")
                 Result.failure(e)
             }
         }
@@ -138,17 +175,32 @@ class ExpenseApiService {
         expenses: List<Expense>,
         chatHistory: List<Pair<String, String>> = emptyList()
     ): Result<String> {
+        Log.d(TAG, "sendChatMessage() called")
+        Log.d(TAG, "User message: $message")
+        Log.d(TAG, "Expenses context: ${expenses.size} items")
+        Log.d(TAG, "Chat history: ${chatHistory.size} messages")
+
         return if (MOCK_MODE) {
+            Log.d(TAG, "Using MOCK_MODE for sendChatMessage")
             generateMockChatResponse(message, expenses, chatHistory)
         } else {
             try {
+                Log.d(TAG, "Making API request to: $BASE_URL/chat")
                 val response: HttpResponse = client.post("$BASE_URL/chat") {
                     contentType(ContentType.Application.Json)
                     setBody(ChatRequest(message, expenses, chatHistory))
                 }
-                val chatResponse = Json.decodeFromString<ChatResponse>(response.bodyAsText())
+
+                val responseBody = response.bodyAsText()
+                Log.d(TAG, "API response status: ${response.status}")
+                Log.d(TAG, "API response body: $responseBody")
+
+                val chatResponse = Json.decodeFromString<ChatResponse>(responseBody)
+                Log.d(TAG, "Successfully received chat response (${chatResponse.message.length} chars)")
                 Result.success(chatResponse.message)
             } catch (e: Exception) {
+                Log.e(TAG, "Error sending chat message", e)
+                Log.e(TAG, "Error details: ${e.message}")
                 Result.failure(e)
             }
         }
@@ -157,6 +209,7 @@ class ExpenseApiService {
     // ==================== Mock функции ====================
 
     private suspend fun generateMockCategory(description: String, amount: Double): Result<String> {
+        Log.d(TAG, "generateMockCategory() - simulating network delay...")
         mockNetworkDelay(1000)
 
         val category = when {
@@ -203,10 +256,12 @@ class ExpenseApiService {
             else -> "Прочее"
         }
 
+        Log.d(TAG, "Mock category generated: $category")
         return Result.success(category)
     }
 
     private suspend fun generateMockAnalysis(expenses: List<Expense>): Result<ExpenseAnalysis> {
+        Log.d(TAG, "generateMockAnalysis() - simulating network delay...")
         mockNetworkDelay(1000)
 
         val totalAmount = expenses.sumOf { it.amount }
@@ -230,6 +285,7 @@ class ExpenseApiService {
             summary = "Ваши расходы за период составили ${String.format("%.2f", totalAmount)} ₽. Основная категория расходов - $topCategory."
         )
 
+        Log.d(TAG, "Mock analysis generated: total=$totalAmount, categories=${categoryBreakdown.size}, top=$topCategory")
         return Result.success(mockAnalysis)
     }
 
@@ -238,6 +294,7 @@ class ExpenseApiService {
         expenses: List<Expense>,
         chatHistory: List<Pair<String, String>>
     ): Result<String> {
+        Log.d(TAG, "generateMockChatResponse() - simulating network delay...")
         mockNetworkDelay(1000)
 
         val totalAmount = expenses.sumOf { it.amount }
@@ -294,10 +351,12 @@ class ExpenseApiService {
             }
         }
 
+        Log.d(TAG, "Mock chat response generated (${response.length} chars)")
         return Result.success(response)
     }
 
     private suspend fun mockNetworkDelay(ms: Long) {
+        Log.d(TAG, "Simulating network delay: ${ms}ms")
         kotlinx.coroutines.delay(ms)
     }
 
