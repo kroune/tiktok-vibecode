@@ -5,7 +5,7 @@ data class ChatScreenState(
     val inputText: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
-    val initialAnalysis: String? = null,
+    val initialAnalysis: ExpenseAnalysis? = null,
     val expenses: List<Expense> = emptyList()
 )
 

@@ -423,90 +423,88 @@ fun ExpenseScreen(
 
         // Результат анализа (показываем только если результат непустой)
         state.analysisResult?.let { result ->
-            if (result.isNotBlank()) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                elevation = 10.dp,
-                                shape = RoundedCornerShape(24.dp),
-                                ambientColor = SoftPastelColors.PastelMint.copy(alpha = 0.3f),
-                                spotColor = SoftPastelColors.SoftShadowDark
-                            ),
-                        colors = CardDefaults.cardColors(
-                            containerColor = SoftPastelColors.SurfaceWhite
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(
+                            elevation = 10.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            ambientColor = SoftPastelColors.PastelMint.copy(alpha = 0.3f),
+                            spotColor = SoftPastelColors.SoftShadowDark
                         ),
-                        shape = RoundedCornerShape(24.dp),
-                        onClick = {
-                            onEvent(ExpenseScreenEvent.OpenChatWithAnalysis)
-                        }
+                    colors = CardDefaults.cardColors(
+                        containerColor = SoftPastelColors.SurfaceWhite
+                    ),
+                    shape = RoundedCornerShape(24.dp),
+                    onClick = {
+                        onEvent(ExpenseScreenEvent.OpenChatWithAnalysis)
+                    }
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(
-                                                brush = Brush.horizontalGradient(
-                                                    colors = listOf(
-                                                        SoftPastelColors.PrimaryGradientStart,
-                                                        SoftPastelColors.PrimaryGradientEnd
-                                                    )
-                                                ),
-                                                shape = CircleShape
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(
+                                            brush = Brush.horizontalGradient(
+                                                colors = listOf(
+                                                    SoftPastelColors.PrimaryGradientStart,
+                                                    SoftPastelColors.PrimaryGradientEnd
+                                                )
                                             ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "✓",
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontWeight = FontWeight.Bold,
-                                                color = SoftPastelColors.SurfaceWhite
-                                            )
-                                        )
-                                    }
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Text(
-                                        text = "Результат анализа",
+                                        text = "✓",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = SoftPastelColors.TextDark
+                                            color = SoftPastelColors.SurfaceWhite
                                         )
                                     )
                                 }
                                 Text(
-                                    text = "💬",
-                                    style = MaterialTheme.typography.titleMedium
+                                    text = "Результат анализа",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = SoftPastelColors.TextDark
+                                    )
                                 )
                             }
                             Text(
-                                text = result,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = SoftPastelColors.TextDark
-                                ),
-                                maxLines = 5,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Нажмите, чтобы обсудить детали с AI ассистентом",
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = SoftPastelColors.TextMuted,
-                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                                )
+                                text = "💬",
+                                style = MaterialTheme.typography.titleMedium
                             )
                         }
+                        Text(
+                            text = result.summary,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = SoftPastelColors.TextDark
+                            ),
+                            maxLines = 5,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Нажмите, чтобы обсудить детали с AI ассистентом",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = SoftPastelColors.TextMuted,
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            )
+                        )
                     }
                 }
             }

@@ -7,6 +7,7 @@ import io.github.kroune.tiktokcopy.domain.entities.ChatMessage
 import io.github.kroune.tiktokcopy.domain.entities.ChatScreenEvent
 import io.github.kroune.tiktokcopy.domain.entities.ChatScreenState
 import io.github.kroune.tiktokcopy.domain.entities.Expense
+import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -14,7 +15,7 @@ import java.time.LocalDateTime
 class ChatScreenComponent(
     componentContext: ComponentContext,
     private val repository: ExpenseRepository,
-    initialAnalysis: String?,
+    initialAnalysis: ExpenseAnalysis?,
     expenses: List<Expense>,
     private val onNavigateBack: () -> Unit
 ) : BaseComponent<ChatScreenState, ChatScreenEvent>(
@@ -27,13 +28,14 @@ class ChatScreenComponent(
     init {
         // Добавляем начальное сообщение от AI с анализом
         if (initialAnalysis != null) {
+            val analysisText = formatAnalysisForChat(initialAnalysis)
             _state.update {
                 it.copy(
                     messages = listOf(
                         ChatMessage(
                             timestamp = LocalDateTime.now(),
                             isFromUser = false,
-                            text = initialAnalysis
+                            text = analysisText
                         )
                     )
                 )
@@ -118,6 +120,30 @@ class ChatScreenComponent(
                 onNavigateBack()
             }
         }
+    }
+
+    private fun formatAnalysisForChat(analysis: ExpenseAnalysis): String {
+        val builder = StringBuilder()
+        builder.appendLine("📊 Анализ ваших расходов")
+        builder.appendLine()
+        builder.appendLine(analysis.summary)
+        builder.appendLine()
+        builder.appendLine("💰 Общая сумма: ${String.format("%.2f", analysis.totalAmount)} ₽")
+        builder.appendLine("📈 Средний расход: ${String.format("%.2f", analysis.averageExpense)} ₽")
+        builder.appendLine("🏆 Топ категория: ${analysis.topCategory}")
+        builder.appendLine()
+        builder.appendLine("📂 Разбивка по категориям:")
+        analysis.categoryBreakdown.forEach { (category, amount) ->
+            builder.appendLine("  • $category: ${String.format("%.2f", amount)} ₽")
+        }
+        if (analysis.recommendations.isNotEmpty()) {
+            builder.appendLine()
+            builder.appendLine("💡 Рекомендации:")
+            analysis.recommendations.forEach { recommendation ->
+                builder.appendLine("  • $recommendation")
+            }
+        }
+        return builder.toString()
     }
 }
 

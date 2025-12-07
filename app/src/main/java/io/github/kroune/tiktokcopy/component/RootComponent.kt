@@ -12,6 +12,7 @@ import com.arkivanov.decompose.value.Value
 import io.github.kroune.tiktokcopy.data.preferences.FirstLaunchManager
 import io.github.kroune.tiktokcopy.data.repository.ExpenseRepository
 import io.github.kroune.tiktokcopy.domain.entities.Expense
+import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -101,7 +102,7 @@ class RootComponent(
 
         @Serializable
         data class ChatScreen(
-            val initialAnalysis: String?,
+            val initialAnalysis: ExpenseAnalysis?,
             val expenses: List<Expense>
         ) : Config
     }

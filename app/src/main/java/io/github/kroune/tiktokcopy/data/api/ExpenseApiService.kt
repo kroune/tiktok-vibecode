@@ -82,8 +82,7 @@ class ExpenseApiService {
      * POST /expenses/analyze
      * Request body: массив объектов Expense
      *
-     * Response (два возможных формата):
-     * 1. JSON объект ExpenseAnalysis:
+     * Response:
      * {
      *   "totalAmount": 500.0,
      *   "categoryBreakdown": {"Food": 200.0, "Transport": 100.0, ...},
@@ -93,12 +92,10 @@ class ExpenseApiService {
      *   "summary": "Общее описание анализа"
      * }
      *
-     * 2. Простой текстовый ответ с результатами анализа
-     *
      * @param expenses список расходов для анализа
-     * @return Result с текстовым результатом анализа или ошибкой
+     * @return Result с объектом ExpenseAnalysis или ошибкой
      */
-    suspend fun analyzeExpenses(expenses: List<Expense>): Result<String> {
+    suspend fun analyzeExpenses(expenses: List<Expense>): Result<ExpenseAnalysis> {
         return if (MOCK_MODE) {
             generateMockAnalysis(expenses)
         } else {
@@ -107,17 +104,8 @@ class ExpenseApiService {
                     contentType(ContentType.Application.Json)
                     setBody(expenses)
                 }
-                val responseText = response.bodyAsText()
-
-                // Пытаемся распарсить как JSON, если не получается - возвращаем как текст
-                val analysisResult = try {
-                    val analysis: ExpenseAnalysis = Json.decodeFromString(responseText)
-                    formatAnalysisResult(analysis)
-                } catch (e: Exception) {
-                    responseText
-                }
-
-                Result.success(analysisResult)
+                val analysis = Json.decodeFromString<ExpenseAnalysis>(response.bodyAsText())
+                Result.success(analysis)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -135,7 +123,10 @@ class ExpenseApiService {
      *   "chatHistory": [["user message", "ai response"], ...]
      * }
      *
-     * Response: текстовый ответ от AI
+     * Response:
+     * {
+     *   "message": "Ответ от AI ассистента"
+     * }
      *
      * @param message сообщение пользователя
      * @param expenses контекст расходов для AI
@@ -155,8 +146,8 @@ class ExpenseApiService {
                     contentType(ContentType.Application.Json)
                     setBody(ChatRequest(message, expenses, chatHistory))
                 }
-                val aiResponse = response.bodyAsText()
-                Result.success(aiResponse)
+                val chatResponse = Json.decodeFromString<ChatResponse>(response.bodyAsText())
+                Result.success(chatResponse.message)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -215,7 +206,7 @@ class ExpenseApiService {
         return Result.success(category)
     }
 
-    private suspend fun generateMockAnalysis(expenses: List<Expense>): Result<String> {
+    private suspend fun generateMockAnalysis(expenses: List<Expense>): Result<ExpenseAnalysis> {
         mockNetworkDelay(1000)
 
         val totalAmount = expenses.sumOf { it.amount }
@@ -239,7 +230,7 @@ class ExpenseApiService {
             summary = "Ваши расходы за период составили ${String.format("%.2f", totalAmount)} ₽. Основная категория расходов - $topCategory."
         )
 
-        return Result.success(formatAnalysisResult(mockAnalysis))
+        return Result.success(mockAnalysis)
     }
 
     private suspend fun generateMockChatResponse(
@@ -310,32 +301,6 @@ class ExpenseApiService {
         kotlinx.coroutines.delay(ms)
     }
 
-    // ==================== Вспомогательные функции ====================
-
-    private fun formatAnalysisResult(analysis: ExpenseAnalysis): String {
-        val builder = StringBuilder()
-        builder.appendLine("📊 Анализ расходов")
-        builder.appendLine()
-        builder.appendLine("💰 Общая сумма: ${String.format("%.2f", analysis.totalAmount)} ₽")
-        builder.appendLine("📈 Средний расход: ${String.format("%.2f", analysis.averageExpense)} ₽")
-        builder.appendLine("🏆 Топ категория: ${analysis.topCategory}")
-        builder.appendLine()
-        builder.appendLine("📂 Разбивка по категориям:")
-        analysis.categoryBreakdown.forEach { (category, amount) ->
-            builder.appendLine("  • $category: ${String.format("%.2f", amount)} ₽")
-        }
-        builder.appendLine()
-        if (analysis.recommendations.isNotEmpty()) {
-            builder.appendLine("💡 Рекомендации:")
-            analysis.recommendations.forEach { recommendation ->
-                builder.appendLine("  • $recommendation")
-            }
-            builder.appendLine()
-        }
-        builder.appendLine("📝 ${analysis.summary}")
-
-        return builder.toString()
-    }
 
     fun close() {
         client.close()
@@ -360,5 +325,10 @@ private data class ChatRequest(
     val message: String,
     val expenses: List<Expense>,
     val chatHistory: List<Pair<String, String>>
+)
+
+@Serializable
+private data class ChatResponse(
+    val message: String
 )
 

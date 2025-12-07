@@ -13,7 +13,7 @@ data class ExpenseScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isAnalyzing: Boolean = false,
-    val analysisResult: String? = null,
+    val analysisResult: ExpenseAnalysis? = null,
     val dateFilter: DateFilter = DateFilter.ALL,
     val showDatePicker: Boolean = false
 )

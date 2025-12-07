@@ -5,16 +5,18 @@ import io.github.kroune.tiktokcopy.base.BaseComponent
 import io.github.kroune.tiktokcopy.data.repository.ExpenseRepository
 import io.github.kroune.tiktokcopy.domain.entities.DateFilter
 import io.github.kroune.tiktokcopy.domain.entities.Expense
+import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseScreenEvent
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseScreenState
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import kotlin.fold
 
 class ExpenseScreenComponent(
     componentContext: ComponentContext,
     private val repository: ExpenseRepository,
-    private val onNavigateToChat: (analysis: String?, expenses: List<Expense>) -> Unit = { _, _ -> }
+    private val onNavigateToChat: (analysis: ExpenseAnalysis?, expenses: List<Expense>) -> Unit = { _, _ -> }
 ) : BaseComponent<ExpenseScreenState, ExpenseScreenEvent>(
     ExpenseScreenState(),
     componentContext

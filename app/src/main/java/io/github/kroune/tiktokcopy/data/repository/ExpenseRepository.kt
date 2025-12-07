@@ -4,6 +4,7 @@ import io.github.kroune.tiktokcopy.data.api.ExpenseApiService
 import io.github.kroune.tiktokcopy.data.local.ExpenseDao
 import io.github.kroune.tiktokcopy.data.local.ExpenseEntity
 import io.github.kroune.tiktokcopy.domain.entities.Expense
+import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -93,7 +94,7 @@ class ExpenseRepository(
         }
     }
 
-    suspend fun analyzeExpenses(expenses: List<Expense>): Result<String> {
+    suspend fun analyzeExpenses(expenses: List<Expense>): Result<ExpenseAnalysis> {
         return apiService.analyzeExpenses(expenses)
     }
 
