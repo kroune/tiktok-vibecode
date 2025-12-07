@@ -329,6 +329,13 @@ fun ExpenseScreen(
             )
         }
 
+        // Круговой график по категориям
+        if (state.filteredExpenses.isNotEmpty()) {
+            item {
+                CategoryPieChart(expenses = state.filteredExpenses)
+            }
+        }
+
         // Кнопка анализа
         item {
             Button(
@@ -739,5 +746,192 @@ fun DatePickerDialog(
             }
         }
     )
+}
+
+@Composable
+fun CategoryPieChart(expenses: List<io.github.kroune.tiktokcopy.domain.entities.Expense>) {
+    // Группируем расходы по категориям и считаем суммы
+    val categoryTotals = expenses
+        .filter { it.category != null && !it.isGeneratingCategory }
+        .groupBy { it.category }
+        .mapValues { entry -> entry.value.sumOf { it.amount } }
+        .toList()
+        .sortedByDescending { it.second }
+
+    if (categoryTotals.isEmpty()) {
+        return
+    }
+
+    val totalAmount = categoryTotals.sumOf { it.second }
+
+    // Цвета для категорий
+    val categoryColors = listOf(
+        SoftPastelColors.PrimaryGradientEnd,
+        SoftPastelColors.PastelMint,
+        SoftPastelColors.SecondaryAccent,
+        Color(0xFF9C88FF),  // Пастельный фиолетовый
+        Color(0xFFFFB8D1),  // Пастельный розовый
+        Color(0xFFFFC785),  // Пастельный оранжевый
+        Color(0xFF85E3FF),  // Пастельный голубой
+        Color(0xFFB4F8C8)   // Пастельный зеленый
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(24.dp),
+                ambientColor = SoftPastelColors.SoftShadowDark,
+                spotColor = SoftPastelColors.SoftShadowGray
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = SoftPastelColors.SurfaceWhite
+        ),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Распределение по категориям",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = SoftPastelColors.TextDark
+                )
+            )
+
+            // Рисуем круговой график
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                PieChartVisual(
+                    categoryTotals = categoryTotals,
+                    totalAmount = totalAmount,
+                    colors = categoryColors
+                )
+            }
+
+            // Легенда
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                categoryTotals.forEachIndexed { index, (category, amount) ->
+                    val percentage = (amount / totalAmount * 100)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .background(
+                                        color = categoryColors[index % categoryColors.size],
+                                        shape = CircleShape
+                                    )
+                            )
+                            Text(
+                                text = category ?: "Без категории",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = SoftPastelColors.TextDark
+                                )
+                            )
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = "₽${String.format(Locale.getDefault(), "%.2f", amount)}",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = SoftPastelColors.TextDark
+                                )
+                            )
+                            Text(
+                                text = "${String.format(Locale.getDefault(), "%.1f", percentage)}%",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = SoftPastelColors.TextMuted
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PieChartVisual(
+    categoryTotals: List<Pair<String?, Double>>,
+    totalAmount: Double,
+    colors: List<Color>
+) {
+    androidx.compose.foundation.Canvas(
+        modifier = Modifier
+            .size(250.dp)
+    ) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+        val radius = minOf(canvasWidth, canvasHeight) / 2f * 0.8f
+        val center = androidx.compose.ui.geometry.Offset(canvasWidth / 2f, canvasHeight / 2f)
+
+        var currentAngle = -90f // Начинаем сверху
+
+        categoryTotals.forEachIndexed { index, (_, amount) ->
+            val sweepAngle = (amount / totalAmount * 360f).toFloat()
+
+            drawArc(
+                color = colors[index % colors.size],
+                startAngle = currentAngle,
+                sweepAngle = sweepAngle,
+                useCenter = true,
+                topLeft = androidx.compose.ui.geometry.Offset(
+                    center.x - radius,
+                    center.y - radius
+                ),
+                size = androidx.compose.ui.geometry.Size(radius * 2f, radius * 2f)
+            )
+
+            currentAngle += sweepAngle
+        }
+
+        // Белый круг в центре для эффекта "пончика"
+        drawCircle(
+            color = SoftPastelColors.SurfaceWhite,
+            radius = radius * 0.5f,
+            center = center
+        )
+    }
+
+    // Текст в центре
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Всего",
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = SoftPastelColors.TextMuted
+            )
+        )
+        Text(
+            text = "₽${String.format(Locale.getDefault(), "%.2f", totalAmount)}",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = SoftPastelColors.TextDark
+            )
+        )
+    }
 }
 
