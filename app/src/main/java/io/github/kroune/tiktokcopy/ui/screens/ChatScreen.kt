@@ -215,6 +215,7 @@ fun ChatScreen(
                         ambientColor = SoftPastelColors.SoftShadowDark,
                         spotColor = SoftPastelColors.SoftShadowGray
                     )
+                    .navigationBarsPadding()
             ) {
                 Row(
                     modifier = Modifier
