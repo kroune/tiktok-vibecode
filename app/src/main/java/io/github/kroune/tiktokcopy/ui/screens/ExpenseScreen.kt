@@ -132,7 +132,7 @@ fun ExpenseScreen(
                 shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(vertical = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
@@ -140,12 +140,14 @@ fun ExpenseScreen(
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = SoftPastelColors.TextDark
-                        )
+                        ),
+                        modifier = Modifier.padding(horizontal = 20.dp)
                     )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         DateFilter.entries.forEach { filter ->
@@ -493,9 +495,7 @@ fun ExpenseScreen(
                             text = result.summary,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = SoftPastelColors.TextDark
-                            ),
-                            maxLines = 5,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -804,7 +804,7 @@ fun CategoryPieChart(expenses: List<io.github.kroune.tiktokcopy.domain.entities.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .height(320.dp),
                 contentAlignment = Alignment.Center
             ) {
                 PieChartVisual(
@@ -875,61 +875,78 @@ fun PieChartVisual(
     totalAmount: Double,
     colors: List<Color>
 ) {
-    androidx.compose.foundation.Canvas(
-        modifier = Modifier
-            .size(250.dp)
-    ) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height
-        val radius = minOf(canvasWidth, canvasHeight) / 2f * 0.8f
-        val center = androidx.compose.ui.geometry.Offset(canvasWidth / 2f, canvasHeight / 2f)
+    Box(contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .size(280.dp)
+        ) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+            val radius = minOf(canvasWidth, canvasHeight) / 2f * 0.85f
+            val center = androidx.compose.ui.geometry.Offset(canvasWidth / 2f, canvasHeight / 2f)
 
-        var currentAngle = -90f // Начинаем сверху
+            var currentAngle = -90f // Начинаем сверху
 
-        categoryTotals.forEachIndexed { index, (_, amount) ->
-            val sweepAngle = (amount / totalAmount * 360f).toFloat()
-
-            drawArc(
-                color = colors[index % colors.size],
-                startAngle = currentAngle,
-                sweepAngle = sweepAngle,
-                useCenter = true,
-                topLeft = androidx.compose.ui.geometry.Offset(
-                    center.x - radius,
-                    center.y - radius
-                ),
-                size = androidx.compose.ui.geometry.Size(radius * 2f, radius * 2f)
+            // Рисуем тень под диаграммой
+            drawCircle(
+                color = Color.Black.copy(alpha = 0.08f),
+                radius = radius,
+                center = androidx.compose.ui.geometry.Offset(center.x + 4f, center.y + 4f)
             )
 
-            currentAngle += sweepAngle
+            categoryTotals.forEachIndexed { index, (_, amount) ->
+                val sweepAngle = (amount / totalAmount * 360f).toFloat()
+
+                // Рисуем сегмент
+                drawArc(
+                    color = colors[index % colors.size],
+                    startAngle = currentAngle,
+                    sweepAngle = sweepAngle,
+                    useCenter = true,
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        center.x - radius,
+                        center.y - radius
+                    ),
+                    size = androidx.compose.ui.geometry.Size(radius * 2f, radius * 2f)
+                )
+
+                currentAngle += sweepAngle
+            }
+
+            // Белый круг в центре для эффекта "пончика" с тенью
+            drawCircle(
+                color = Color.Black.copy(alpha = 0.05f),
+                radius = radius * 0.58f,
+                center = androidx.compose.ui.geometry.Offset(center.x + 2f, center.y + 2f)
+            )
+
+            drawCircle(
+                color = SoftPastelColors.SurfaceWhite,
+                radius = radius * 0.58f,
+                center = center
+            )
         }
 
-        // Белый круг в центре для эффекта "пончика"
-        drawCircle(
-            color = SoftPastelColors.SurfaceWhite,
-            radius = radius * 0.5f,
-            center = center
-        )
-    }
-
-    // Текст в центре
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Всего",
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = SoftPastelColors.TextMuted
+        // Текст в центре
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Всего",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = SoftPastelColors.TextMuted
+                )
             )
-        )
-        Text(
-            text = "₽${String.format(Locale.getDefault(), "%.2f", totalAmount)}",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = SoftPastelColors.TextDark
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "₽${String.format(Locale.getDefault(), "%.2f", totalAmount)}",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = SoftPastelColors.TextDark
+                )
             )
-        )
+        }
     }
 }
 

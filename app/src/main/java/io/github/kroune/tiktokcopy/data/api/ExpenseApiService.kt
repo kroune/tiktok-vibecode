@@ -25,8 +25,8 @@ import kotlinx.serialization.json.Json
 class ExpenseApiService {
 
     companion object {
-        private const val BASE_URL = "https://your-backend-url.com/api"
-        private const val MOCK_MODE = true // Включен режим mock данных для разработки
+        private const val BASE_URL = "https://vibecode.kroune.tech/api"
+        private const val MOCK_MODE = false // Включен режим mock данных для разработки
     }
 
     private val client = HttpClient(CIO) {
