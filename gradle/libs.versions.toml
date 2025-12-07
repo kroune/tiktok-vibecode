@@ -35,6 +35,9 @@ detekt = "2.0.0-alpha.1"
 gms = "4.4.4"
 workRuntimeKtx = "2.11.0"
 workManager = "2.11.0"
+room = "2.7.2"
+ksp = "2.3.3"
+datastore = "1.1.1"
 
 [libraries]
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-splash" }
@@ -81,7 +84,14 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -99,3 +109,5 @@ kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = 
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot"}
 gms = { id = "com.google.gms.google-services", version.ref = "gms"}
+
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

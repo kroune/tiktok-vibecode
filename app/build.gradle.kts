@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gms)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -54,6 +55,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     api(libs.decompose)
+    implementation(libs.decompose.animations)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.serialization.kotlinx.json)
@@ -70,4 +72,12 @@ dependencies {
     implementation(libs.androidx.workmanager)
 
     implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.ktor.client.cio)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    implementation(libs.datastore.preferences)
 }

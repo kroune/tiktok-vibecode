@@ -10,4 +10,5 @@ plugins {
     alias(libs.plugins.baseline.profile) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.gms) apply false
+    alias(libs.plugins.google.devtools.ksp) apply false
 }
