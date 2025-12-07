@@ -10,6 +10,7 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import io.github.kroune.tiktokcopy.data.preferences.FirstLaunchManager
+import io.github.kroune.tiktokcopy.data.repository.ChallengeRepository
 import io.github.kroune.tiktokcopy.data.repository.ExpenseRepository
 import io.github.kroune.tiktokcopy.domain.entities.Expense
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
@@ -22,7 +23,8 @@ import kotlinx.serialization.Serializable
 class RootComponent(
     componentContext: ComponentContext,
     private val repository: ExpenseRepository,
-    private val firstLaunchManager: FirstLaunchManager
+    private val challengeRepository: ChallengeRepository,
+    private val firstLaunchManager: FirstLaunchManager,
 ) : ComponentContext by componentContext {
 
     private val navigation = StackNavigation<Config>()
@@ -64,15 +66,18 @@ class RootComponent(
                     }
                 )
             )
+
             is Config.Main -> Child.Main(
                 component = MainComponent(
                     componentContext = componentContext,
                     repository = repository,
+                    challengeRepository = challengeRepository,
                     onNavigateToChat = { analysis, expenses ->
                         navigation.push(Config.ChatScreen(analysis, expenses))
                     }
                 )
             )
+
             is Config.ChatScreen -> Child.ChatScreen(
                 component = ChatScreenComponent(
                     componentContext = componentContext,

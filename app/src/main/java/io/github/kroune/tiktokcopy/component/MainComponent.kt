@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
+import io.github.kroune.tiktokcopy.data.repository.ChallengeRepository
 import io.github.kroune.tiktokcopy.data.repository.ExpenseRepository
 import io.github.kroune.tiktokcopy.domain.entities.Expense
 import io.github.kroune.tiktokcopy.domain.entities.ExpenseAnalysis
@@ -14,6 +15,7 @@ import kotlinx.serialization.Serializable
 class MainComponent(
     componentContext: ComponentContext,
     private val repository: ExpenseRepository,
+    private val challengeRepository: ChallengeRepository,
     private val onNavigateToChat: (analysis: ExpenseAnalysis?, expenses: List<Expense>) -> Unit = { _, _ -> }
 ) : ComponentContext by componentContext {
 
@@ -46,7 +48,8 @@ class MainComponent(
             )
             is Config.Challenges -> Child.Challenges(
                 component = ChallengesComponent(
-                    componentContext = componentContext
+                    componentContext = componentContext,
+                    repository = challengeRepository
                 )
             )
         }

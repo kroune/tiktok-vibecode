@@ -17,10 +17,18 @@ object SoftPastelColors {
 
     // Surface/Cards - с легким оттенком
     val SurfaceWhite = Color(0xFFFFFFFF)
+    val CardBackground = Color(0xFFFFFFFF)
+    val SuccessBackground = Color(0xFFE8F8F0)
 
     // Text - более контрастный
     val TextDark = Color(0xFF1A1A1A)
     val TextMuted = Color(0xFF6B6B8A)
+    val TextWhite = Color(0xFFFFFFFF)
+    val TextPrimary = Color(0xFF1A1A1A)
+    val TextSecondary = Color(0xFF6B6B8A)
+
+    // Status colors
+    val Success = Color(0xFF4CAF50)
 
     // Pastel Colors for Charts/Categories - более насыщенные
     val PastelMint = Color(0xFF90D9B8)

@@ -7,13 +7,14 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [ExpenseEntity::class],
-    version = 1,
+    entities = [ExpenseEntity::class, ChallengeEntity::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(LocalDateTimeConverter::class)
 abstract class ExpenseDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
+    abstract fun challengeDao(): ChallengeDao
 
     companion object {
         @Volatile
