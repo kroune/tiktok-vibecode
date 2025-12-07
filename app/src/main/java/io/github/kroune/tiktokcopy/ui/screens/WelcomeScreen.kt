@@ -33,7 +33,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -80,6 +82,7 @@ fun WelcomeScreen(
     )
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState.currentPage) {
         onEvent(WelcomeScreenEvent.OnPageChange(pagerState.currentPage))
@@ -156,7 +159,10 @@ fun WelcomeScreen(
             Button(
                 onClick = {
                     if (pagerState.currentPage < pages.size - 1) {
-                        // Переход к следующей странице через корутину не нужен здесь
+                        // Переход к следующей странице с анимацией
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
                     } else {
                         onEvent(WelcomeScreenEvent.OnGetStarted)
                     }
