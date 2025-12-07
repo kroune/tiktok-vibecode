@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1008553925608",
+    "project_id": "tiktok-copy-ba879",
+    "storage_bucket": "tiktok-copy-ba879.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008553925608:android:3a8388050d63d3652d225d",
+        "android_client_info": {
+          "package_name": "io.github.kroune.tiktokcopy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBosnDSCVdfKLbh2-ch77nGL_qTQiAp4U4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
